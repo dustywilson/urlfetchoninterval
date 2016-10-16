@@ -1,0 +1,1 @@
+docker run -d -e "HTTP_HOST=somesite.example.com" -e "GET_PATH=/wp-cron.php?doing_wp_cron" --link some-website-container:site scjalliance/urlfetchoninterval
