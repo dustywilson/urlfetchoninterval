@@ -13,5 +13,5 @@ fi
 
 while true; do
 	sleep 60s
-	wget -O/dev/null --header="X-Forwarded-Email: dusty.wilson@scjalliance.com" --header="X-Forwarded-User: dusty.wilson" "http://$HTTP_HOST$GET_PATH"
+	wget -O/dev/null --header="X-Forwarded-Email: emmaly.wilson@scjalliance.com" --header="X-Forwarded-User: emmaly.wilson" "http://$HTTP_HOST$GET_PATH"
 done
