@@ -23,5 +23,5 @@ Flags:
   docker run -d scjalliance/urlfetchoninterval -i 5m somesite.example.com/wp-cron.php?doing_wp_cron
 ```
 ```
-  docker run -d scjalliance/urlfetchoninterval -e "FETCH_INTERVAL=5m" -e "FETCH_URL=somesite.example.com/wp-cron.php?doing_wp_cron" 
+  docker run -d -e "FETCH_INTERVAL=5m" -e "FETCH_URL=somesite.example.com/wp-cron.php?doing_wp_cron" scjalliance/urlfetchoninterval 
 ```
