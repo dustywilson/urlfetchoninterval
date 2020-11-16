@@ -24,4 +24,4 @@ FROM gcr.io/distroless/base
 
 COPY --from=builder /go/bin/urlfetchoninterval /
 
-CMD ["/urlfetchoninterval"]
+ENTRYPOINT ["/urlfetchoninterval"]
