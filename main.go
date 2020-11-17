@@ -95,7 +95,7 @@ func main() {
 	fmt.Printf("The process has started with this configuration:\n  %s\n", strings.Join(opts.Summary(), "\n  "))
 
 	// Fetch on an interval until we receive a shutdown signal
-	ticker := time.NewTicker(opts.Timeout)
+	ticker := time.NewTicker(opts.Interval)
 	defer ticker.Stop()
 
 	for {
