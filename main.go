@@ -93,6 +93,15 @@ func main() {
 	// Announce startup
 	fmt.Printf("The process has started with this configuration:\n  %s\n", strings.Join(opts.Summary(), "\n  "))
 
+	// Perform an initial fetch
+	select {
+	case <-ctx.Done():
+		fmt.Println("The process has stopped.")
+		return
+	default:
+		fetch(ctx, client, opts)
+	}
+
 	// Fetch on an interval until we receive a shutdown signal
 	ticker := time.NewTicker(opts.Interval)
 	defer ticker.Stop()
@@ -103,7 +112,7 @@ func main() {
 			fmt.Println("The process has stopped.")
 			return
 		case <-ticker.C:
-			fetch(ctx, client, opts.URL, opts.Host, opts.Headers, opts.Verbose)
+			fetch(ctx, client, opts)
 		}
 	}
 }
@@ -129,18 +138,18 @@ func newClient(timeout time.Duration, proxy *url.URL) *http.Client {
 	}
 }
 
-func fetch(ctx context.Context, c *http.Client, u *url.URL, host string, headers map[string]string, verbose bool) {
+func fetch(ctx context.Context, c *http.Client, opts options) {
 	// Prepare an HTTP request with the given URL, host and headers
-	req, err := http.NewRequest("GET", u.String(), nil)
+	req, err := http.NewRequest("GET", opts.URL.String(), nil)
 	if err != nil {
-		fmt.Printf("FETCH %s request failure: %v\n", u, err)
+		fmt.Printf("FETCH %s request preparation failure: %v\n", opts.URL, err)
 		return
 	}
 
-	if host != "" {
-		req.Host = host
+	if opts.Host != "" {
+		req.Host = opts.Host
 	}
-	for key, value := range headers {
+	for key, value := range opts.Headers {
 		req.Header[key] = []string{value}
 	}
 
@@ -150,17 +159,17 @@ func fetch(ctx context.Context, c *http.Client, u *url.URL, host string, headers
 	// Execute the HTTP request
 	resp, err := c.Do(req)
 	if err != nil {
-		fmt.Printf("FETCH %s %v\n", u, err)
+		fmt.Printf("FETCH %s %v\n", opts.URL, err)
 		return
 	}
 	defer resp.Body.Close() // This will drain resp.Body if necessary
 
 	// If verbose output has been requested, dump the body to stdout
-	if verbose {
-		fmt.Printf("FETCH %s %v\n------------\n", u, resp.Status)
+	if opts.Verbose {
+		fmt.Printf("FETCH %s %v\n------------\n", opts.URL, resp.Status)
 		io.Copy(os.Stdout, resp.Body)
 		fmt.Printf("------------\n")
 	} else {
-		fmt.Printf("FETCH %s %v\n", u, resp.Status)
+		fmt.Printf("FETCH %s %v\n", opts.URL, resp.Status)
 	}
 }
