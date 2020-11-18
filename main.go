@@ -132,6 +132,11 @@ func newClient(timeout time.Duration, proxy *url.URL) *http.Client {
 func fetch(ctx context.Context, c *http.Client, u *url.URL, host string, headers map[string]string, verbose bool) {
 	// Prepare an HTTP request with the given URL, host and headers
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		fmt.Printf("FETCH %s request failure: %v\n", u, err)
+		return
+	}
+
 	if host != "" {
 		req.Host = host
 	}
