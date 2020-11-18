@@ -26,11 +26,6 @@ type options struct {
 	Verbose  bool              `kong:"env='VERBOSE',short='v'"`
 }
 
-type header struct {
-	Key   string
-	Value string
-}
-
 func (opts *options) Validate() error {
 	if u := opts.URL; u != nil {
 		if !u.IsAbs() {
@@ -104,7 +99,7 @@ func main() {
 			fmt.Println("The process has stopped.")
 			return
 		case <-ticker.C:
-			fetch(ctx, client, opts.URL, opts.Verbose)
+			fetch(ctx, client, opts.URL, opts.Headers, opts.Verbose)
 		}
 	}
 }
@@ -130,10 +125,14 @@ func newClient(timeout time.Duration, proxy *url.URL) *http.Client {
 	}
 }
 
-func fetch(ctx context.Context, c *http.Client, u *url.URL, verbose bool) {
-	// Prepare an hTTP request with the given context for cancellation
-	// This facilitates cancellation via CTRL+C
+func fetch(ctx context.Context, c *http.Client, u *url.URL, headers map[string]string, verbose bool) {
+	// Prepare an HTTP request with the given URL and headers
 	req, err := http.NewRequest("GET", u.String(), nil)
+	for key, value := range headers {
+		req.Header[key] = []string{value}
+	}
+
+	// Include the given context for cancellation (this facilitates CTRL+C)
 	req = req.WithContext(ctx)
 
 	// Execute the HTTP request
