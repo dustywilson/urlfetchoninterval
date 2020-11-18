@@ -13,6 +13,7 @@ Flags:
   -i, --interval=1m              ($FETCH_INTERVAL)
   -t, --timeout=5s               ($FETCH_TIMEOUT)
       --headers=KEY=VALUE;...    ($FETCH_HEADERS)
+      --host=STRING              ($FETCH_HOST)
   -p, --proxy=PROXY              ($PROXY_URL)
   -v, --verbose                  ($VERBOSE)
   ```
