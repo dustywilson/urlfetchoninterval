@@ -22,6 +22,7 @@ type options struct {
 	Interval time.Duration     `kong:"env='FETCH_INTERVAL',default='1m',short='i'"`
 	Timeout  time.Duration     `kong:"env='FETCH_TIMEOUT',default='5s',short='t'"`
 	Headers  map[string]string `kong:"env='FETCH_HEADERS',sep=';'"`
+	Host     string            `kong:"env='FETCH_HOST'"`
 	Proxy    *url.URL          `kong:"env='PROXY_URL',short='p'"`
 	Verbose  bool              `kong:"env='VERBOSE',short='v'"`
 }
@@ -51,6 +52,9 @@ func (opts *options) Validate() error {
 
 func (opts *options) Summary() (lines []string) {
 	lines = append(lines, fmt.Sprintf("URL: %s", opts.URL))
+	if opts.Host != "" {
+		lines = append(lines, fmt.Sprintf("HOST: %s", opts.Host))
+	}
 	lines = append(lines, fmt.Sprintf("INTERVAL: %s", opts.Interval))
 	lines = append(lines, fmt.Sprintf("TIMEOUT: %s", opts.Timeout))
 	if opts.Proxy != nil {
@@ -99,7 +103,7 @@ func main() {
 			fmt.Println("The process has stopped.")
 			return
 		case <-ticker.C:
-			fetch(ctx, client, opts.URL, opts.Headers, opts.Verbose)
+			fetch(ctx, client, opts.URL, opts.Host, opts.Headers, opts.Verbose)
 		}
 	}
 }
@@ -125,9 +129,12 @@ func newClient(timeout time.Duration, proxy *url.URL) *http.Client {
 	}
 }
 
-func fetch(ctx context.Context, c *http.Client, u *url.URL, headers map[string]string, verbose bool) {
-	// Prepare an HTTP request with the given URL and headers
+func fetch(ctx context.Context, c *http.Client, u *url.URL, host string, headers map[string]string, verbose bool) {
+	// Prepare an HTTP request with the given URL, host and headers
 	req, err := http.NewRequest("GET", u.String(), nil)
+	if host != "" {
+		req.Host = host
+	}
 	for key, value := range headers {
 		req.Header[key] = []string{value}
 	}
