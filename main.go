@@ -21,7 +21,7 @@ type options struct {
 	URL      *url.URL          `kong:"env='FETCH_URL',required,arg"`
 	Interval time.Duration     `kong:"env='FETCH_INTERVAL',default='1m',short='i'"`
 	Timeout  time.Duration     `kong:"env='FETCH_TIMEOUT',default='5s',short='t'"`
-	Headers  map[string]string `kong:"env='FETCH_HEADERS'"`
+	Headers  map[string]string `kong:"env='FETCH_HEADERS',sep=';'"`
 	Proxy    *url.URL          `kong:"env='PROXY_URL',short='p'"`
 	Verbose  bool              `kong:"env='VERBOSE',short='v'"`
 }
